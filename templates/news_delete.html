@@ -1,0 +1,43 @@
+{% extends 'flatpages/default.html' %}
+{% block title %} Post list {% endblock title %}
+{% load custom_filters %}
+
+{% block content %}
+<h2>Вы действительно хотите удалить данный товар?</h2>
+<table>
+    <thead>
+        <th>
+            Name
+        </th>
+        <th>
+            Category
+        </th>
+        <th>
+            Price
+        </th>
+        <th>
+            Quantity
+        </th>
+    </thead>
+    <tr>
+                <td>
+                    {{ post.id}} <!-- попробуем умножить название товара на строку а -->
+                </td>
+                <td>
+                    {{ post.heder|Censor}} <!-- попробуем умножить название товара на строку а -->
+                </td>
+                <td>
+                    {% filter Censor %}
+                    {{ post.text|truncatechars:50}}
+                    {% endfilter %}
+                </td>
+                <td>
+                    {{ post.time_in}}
+                </td>
+            </tr>
+</table>
+
+<form method="POST">
+    {% csrf_token %}
+    <input type="submit" value="подтвердить"></form>
+{% endblock content %}
