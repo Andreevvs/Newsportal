@@ -1,8 +1,14 @@
 from django.forms import ModelForm, BooleanField  # Импортируем true-false поле
-from .models import Post
+from .models import Post, Category
 from django.contrib.auth.models import User
 from allauth.account.forms import SignupForm
 from django.contrib.auth.models import Group
+
+class CategoryForm(ModelForm):
+
+    class Meta:
+        model = Category
+        fields = ['category']  # не забываем включить галочку в поля иначе она не будет показываться на странице!
 
 class PostForm(ModelForm):
 

@@ -1,17 +1,26 @@
 from django.views.generic import ListView, UpdateView, CreateView, DetailView, DeleteView  # импортируем класс получения деталей объекта
 from django.views.generic.edit import CreateView
-from .models import Post, BaseRegisterForm
-from datetime import datetime
+from .models import Post, Category, BaseRegisterForm
+from datetime import datetime, date, timedelta
 from django.core.paginator import Paginator
 from .filters import PostFilter
-from .forms import PostForm,UserForm
+from .forms import PostForm,UserForm, CategoryForm
 from django.contrib.auth.models import User, Group
 from django.contrib.auth.mixins import PermissionRequiredMixin, LoginRequiredMixin
 from django.views.generic import TemplateView
 from django.shortcuts import redirect,render
 from django.contrib.auth.decorators import login_required
+from django.core.mail import send_mail
+from django.http import HttpResponseRedirect
+from django.db.models.signals import post_save,m2m_changed
 
-
+class CategoryList(ListView):
+    model = Category
+    template_name = 'category.html'
+    context_object_name = 'category'
+    queryset = Category.objects.order_by('-id')
+    paginate_by = 10
+    form_class = CategoryForm
 
 class NewsList(ListView):
     model = Post
@@ -41,6 +50,7 @@ class NewsDetail(DetailView):
     model = Post  # модель всё та же, но мы хотим получать детали конкретно отдельного товара
     template_name = 'newsdetail.html'  # название шаблона будет product.html
     context_object_name = 'newsdetail'  # название объекта. в нём будет
+
 
 class NewsSearch(ListView):
     model = Post  # модель всё та же, но мы хотим получать детали конкретно отдельного товара
@@ -83,6 +93,7 @@ class UserDetailView(LoginRequiredMixin, TemplateView):
         return context
 
 
+
 @login_required
 def upgrade_me(request):
     user = request.user
@@ -91,10 +102,82 @@ def upgrade_me(request):
         premium_group.user_set.add(user)
     return redirect('/')
 
+@login_required
+def add_subscribe( request, pk):
+    user = request.user
+    sid=str(pk)
+    #   print('Пользователь' + user.username + 'добавлен в подписчики категории:'+ sid)
+    Category.objects.get(pk=pk).subscribers.add(user)
+    return redirect('/news/category')
+
+
+@login_required
+def del_subscribe(request, pk):
+    user = request.user
+    #print('Пользователь', request.user, 'удален из подписчиков категории:', Category.objects.get(pk=pk))
+    Category.objects.get(pk=pk).subscribers.remove(request.user)
+    return redirect('/news/category')
+
 class BaseRegisterView(CreateView):
     model = User
     form_class = BaseRegisterForm
     success_url = '/'
+    def post(self, request, *args, **kwargs):
+        form = self.form_class(request.POST)
+        if form.is_valid():
+            first_name = form.cleaned_data.get("first_name")
+            last_name = form.cleaned_data.get("last_name")
+            email = form.cleaned_data.get("email")
+            subject = f' Hello, {first_name}   {last_name}'
+            form.save()
+            print(subject)
+
+        send_mail(
+            subject=subject,
+            message='Спасибо за регистрацию на сайте NewsPortal',
+            from_email='VA9979549@yandex.ru',
+            recipient_list=[email]
+        )
+
+        return HttpResponseRedirect('/news/')
+
+#def notify_subscribers_digest():
+#    for category in Category.all():
+#        print('Тест'+ category.category)
+#   for category in instance.categories.all():
+#        news_categories = news_categories + ', ' + category.category
+#        recipient_list = ''
+#        for user in category.subscribers.all():
+#            recipient_list = recipient_list  + user.email + ' ,'
+#        subject = f' На сайте NewsPortal в категории {category.category} появилась новая статья - {instance.heder}'
+#        print('subject: '+subject)
+#        print('message_body: ' + message_body)
+#        print('recipient_list: ' + recipient_list)
+#    news_categories = ''
+#    message_body = f'Ссылка на статью http://127.0.0.1:8000/news/{instance.pk}'
+#    for category in instance.categories.all():
+#        news_categories = news_categories + ', ' + category.category
+#        recipient_list = ''
+#        for user in category.subscribers.all():
+#            recipient_list = recipient_list  + user.email + ' ,'
+#        subject = f' На сайте NewsPortal в категории {category.category} появилась новая статья - {instance.heder}'
+#        print('subject: '+subject)
+#        print('message_body: ' + message_body)
+#        print('recipient_list: ' + recipient_list)
+#        # send_mail(
+#        #     subject=subject,
+#        #     message= message_body
+#        #     from_email='V9979549@yandex.ru',
+#        #     recipient_list=[recipient_list]
+#        # )
+
+#m2m_changed.connect(notify_subscribers_newnews, sender=Post.categories.through)
+
+
+
+
+
+
 
 #class UserDetailView(DetailView):
 #    template_name = 'user_detail.html'

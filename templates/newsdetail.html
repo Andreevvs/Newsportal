@@ -14,4 +14,9 @@ News
 <h1> Заголовок: {{ newsdetail.heder|Censor }}</h1>
 <h1>Содержвание: {% filter Censor %} {{ newsdetail.text|truncatechars:50}} {% endfilter %}</h1>
 <h1>Дата публикации: {{ newsdetail.time_in|date:"d-M-Y"}}  {{ newsdetail.time_in|time:"H:i"}}</h1>
+<h1>Категории: {% for category in newsdetail.categories.all %}
+                {{ category.category}}
+</h1>
+
+{% endfor %}
 {% endblock content %}

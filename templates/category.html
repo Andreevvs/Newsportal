@@ -1,66 +1,53 @@
 {% extends 'flatpages/default.html' %}
 
-{% load custom_filters %} <!-- не забываем заранее загружать наши фильтры! -->
-
 {% block title %}
-News
+Category
 {% endblock title %}
 
 {% block content %}
-    <h1>Все новости</h1>
-    <h3>{{ time_now }}</h3>
-    <hr>
-    {% if news %}
+    <h1>Категории</h1>
+<hr>
+    {% if category %}
         <table>
             <tr>
                  <td>
-                    <Действие></Действие>
+                    ID
                 </td>
                 <td>
-                    Номер
+                    Кетегория
                 </td>
                 <td>
-                    Зоголовок
+                    Подпиcчики
                 </td>
-                <td>
-                    Текст
-                </td>
-                <td>
-                    Дата публикации
+                 <td>
+                    Действие
                 </td>
             </tr>
-        {%  for post in news %}
+        {%  for category in category %}
             <tr>
+                 <td>
+                    {{category.id}} <!-- попробуем умножить название товара на строку а -->
+                </td>
                 <td>
-            <a href="{% url 'news_detail' post.id %}">{{ product.name|title }}</a> <!-- При нажатии на имя товара в таблице нас теперь будет перекидывать на страницу с самого товара -->
-            <a href="{% url 'news_update' post.id %}"><u>Редактировать</u></a> <!-- добавим ссылку на редактирование товара-->
+                    {{category.category}} <!-- попробуем умножить название товара на строку а -->
+                </td>
+                <td>
+                    {% for user in category.subscribers.all %}
+                    {{ user.username}}, 
+                    {% endfor %}
+                </td>
+                <td>
+            <a href="{% url 'add_subscribe' category.id %}"><u> Подписаться</u></a>
 
-            <a href="{% url 'news_delete' post.id %}"><u> Удалить </u></a> <!-- добавим ссылку на удаление товара-->
-                </td>
-                <td>
-                    {{ post.id}} <!-- попробуем умножить название товара на строку а -->
-                </td>
-                <td>
-                     <a href="{% url 'news_detail' post.id %}">{{ post.heder|Censor }}</a>
-                    <!--{{ post.heder|Censor}}  попробуем умножить название товара на строку а -->
-                </td>
-                <td>
-                    {% filter Censor %}
-                    {{ post.text|truncatechars:50}}
-                    {% endfilter %}
-                </td>
-                <td>
-                    {{ post.time_in}}
+            <a href="{% url 'del_subscribe' category.id %}"><u> Отписаться </u></a>
                 </td>
             </tr>
         {% endfor %}
         </table>
     {% else %}
-        <h2>Новостей нет!</h2>
+        <h2>Категорий нет!</h2>
     {% endif %}
 <!-- Проверяем что поддерживается постраничный вывод -->
-
-<a href="{% url 'news_create' %}">Добавить новость</a> <br>
 
 {% if is_paginated %}
 
