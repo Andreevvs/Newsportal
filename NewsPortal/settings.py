@@ -161,3 +161,13 @@ APSCHEDULER_DATETIME_FORMAT = "N j, Y, f:s a"
 
 # если задача не выполняется за 25 секунд, то она автоматически снимается, можете поставить время побольше, но как правило, это сильно бьёт по производительности сервера
 APSCHEDULER_RUN_NOW_TIMEOUT = 25  # Seconds
+#EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+#Пароль указывается в CELERY_BROKER_URL по следующему формату: redis://:password@hostname:port/db_number
+
+CELERY_BROKER_URL = 'redis://:jJ8pQI9TxAvRwPlaiivqb4uIXhumE1fz@redis-11189.c274.us-east-1-3.ec2.cloud.redislabs.com:11189/#10986890'
+CELERY_RESULT_BACKEND = 'redis://:jJ8pQI9TxAvRwPlaiivqb4uIXhumE1fz@redis-11189.c274.us-east-1-3.ec2.cloud.redislabs.com:11189/#10986890'
+CELERY_ACCEPT_CONTENT = ['application/json']
+CELERY_TASK_SERIALIZER = 'json'
+CELERY_RESULT_SERIALIZER = 'json'
+
+BROKER_POOL_LIMIT=0

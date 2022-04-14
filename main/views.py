@@ -12,7 +12,16 @@ from django.shortcuts import redirect,render
 from django.contrib.auth.decorators import login_required
 from django.core.mail import send_mail
 from django.http import HttpResponseRedirect
+from .tasks import hello, printer, new_news, send_news_update
+from django.http import HttpResponse
+from django.views import View
 from django.db.models.signals import post_save,m2m_changed
+
+class IndexView(View):
+    def get(self, request):
+        printer.delay(10)
+        hello.delay()
+        return HttpResponse('Hello!')
 
 class CategoryList(ListView):
     model = Category
@@ -29,6 +38,8 @@ class NewsList(ListView):
     queryset = Post.objects.order_by('-id')
     paginate_by = 12
     form_class = PostForm
+
+
 
     # метод get_context_data нужен нам для того, чтобы мы могли передать переменные в шаблон. В возвращаемом словаре context будут храниться все переменные. Ключи этого словаря и есть переменные, к которым мы сможем потом обратиться через шаблон
     def get_context_data(self, **kwargs):
@@ -66,6 +77,7 @@ class PostCreateView(PermissionRequiredMixin, CreateView):
     permission_required = ('main.add_post',)
     template_name = 'news_create.html'
     form_class = PostForm
+
 
 class PostUpdateView(UpdateView):
     template_name = 'news_create.html'

@@ -19,14 +19,14 @@ def notify_subscribers_newnews(sender, instance,  **kwargs):
             else:
                 recipient_list = recipient_list +' ,'+ user.email
         subject = f' На сайте NewsPortal в категории {category.category} появилась новая статья - {instance.heder}'
-        print('subject: '+subject)
-        print('message_body: ' + message_body)
-        print('recipient_list: ' + recipient_list)
-        send_mail(
-            subject=subject,
-            message=message_body,
-            from_email = 'VA9979549@yandex.ru',
-            recipient_list = [recipient_list],
-            )
+       #print('subject: '+subject)
+       # print('message_body: ' + message_body)
+       # print('recipient_list: ' + recipient_list)
+       # send_mail(
+       #     subject=subject,
+       #     message=message_body,
+       #     from_email = 'VA9979549@yandex.ru',
+       #     recipient_list = [recipient_list],
+       #     )
 
 #m2m_changed.connect(notify_subscribers_newnews, sender=Post.categories.through)
