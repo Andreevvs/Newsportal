@@ -1,6 +1,6 @@
 from django.views.generic import ListView, UpdateView, CreateView, DetailView, DeleteView  # импортируем класс получения деталей объекта
 from django.views.generic.edit import CreateView
-from .models import Post, Category, BaseRegisterForm
+from .models import Post, Category, BaseRegisterForm, Author
 from datetime import datetime, date, timedelta
 from django.core.paginator import Paginator
 from .filters import PostFilter
@@ -16,6 +16,7 @@ from .tasks import hello, printer, new_news, send_news_update
 from django.http import HttpResponse
 from django.views import View
 from django.db.models.signals import post_save,m2m_changed
+from django.core.cache import cache
 
 class IndexView(View):
     def get(self, request):
@@ -77,6 +78,24 @@ class PostCreateView(PermissionRequiredMixin, CreateView):
     permission_required = ('main.add_post',)
     template_name = 'news_create.html'
     form_class = PostForm
+
+    def post(self, request, *args, **kwargs):
+       # post = Post(
+       #     id_author=Author.objects.get(id_user=request.user),
+       #     header=request.POST['header'],
+       #     text=request.POST['text']
+        #)
+        #post.save()
+        post = Post(
+            id_author=Author.objects.get(User=request.user),
+            heder=request.POST['heder'],
+            text=request.POST['text']
+        )
+        print(post.text + 'dfsdfsdf' + post.heder + str(post.time_in))
+        print ('author_id'+ str(post.author_id))
+        post.save()
+        #print('def post')
+        #print(post.header)
 
 
 class PostUpdateView(UpdateView):
